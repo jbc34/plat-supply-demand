@@ -1,0 +1,370 @@
+# Observable Proxy Definitions
+# Maps observable data series to latent state variables (Demand, Supply, Capital Flow)
+#
+# This file is the SINGLE SOURCE OF TRUTH for:
+#   - Which proxies map to which state variables (D, S, K)
+#   - Proxy weights and loadings
+#   - Lead/lag relationships
+#   - Data source configurations
+#
+# See also: research/data_catalog.md for full series metadata (start dates, frequencies)
+#
+# Last updated: 2026-01-14
+
+# =============================================================================
+# DEMAND PROXIES (D)
+# =============================================================================
+demand_proxies:
+  # --- PRIMARY: Employment (BLS) ---
+  employment_growth:
+    source: bls
+    series_id: null  # Set per market in markets.yaml
+    frequency: monthly
+    lag: -2  # leads demand realization by ~2 months
+    noise_level: low
+    weight: 0.30
+    loading: 1.0
+    status: active
+    description: "MSA total nonfarm employment growth - primary D proxy"
+
+  # --- SECONDARY: CoStar demand metrics ---
+  net_absorption:
+    source: costar
+    series_key: "net_absorption"
+    frequency: quarterly
+    lag: 0  # contemporaneous
+    noise_level: medium
+    weight: 0.25
+    loading: 1.0
+    status: planned  # requires CoStar API
+    description: "Quarterly net absorption in units"
+
+  occupancy_rate:
+    source: costar
+    series_key: "occupancy_rate"
+    frequency: monthly
+    lag: 1  # 1 period lag (sticky)
+    noise_level: low
+    weight: 0.20
+    loading: 1.0
+    status: planned
+    description: "Market occupancy rate percentage"
+
+  effective_rent_growth:
+    source: costar
+    series_key: "effective_rent_growth"
+    frequency: monthly
+    lag: 0
+    noise_level: medium
+    weight: 0.15
+    loading: 1.0
+    status: planned
+    description: "Year-over-year effective rent growth"
+
+  # --- AVAILABLE: Other demand indicators ---
+  net_migration:
+    source: census
+    series_key: "net_migration"
+    frequency: annual
+    lag: -4  # leads significantly
+    noise_level: high
+    weight: 0.10
+    loading: 1.0
+    status: available
+    description: "Annual net domestic migration"
+
+  real_disposable_income:
+    source: fred
+    series_id: "DSPIC96"
+    frequency: monthly
+    lag: -1
+    noise_level: low
+    weight: 0.10
+    loading: 1.0
+    status: available
+    description: "Real disposable personal income - national"
+
+  unemployment_rate:
+    source: fred
+    series_id: "UNRATE"
+    frequency: monthly
+    lag: 0
+    noise_level: low
+    weight: 0.10
+    loading: -1.0  # negative: higher unemployment = lower demand
+    status: available
+    description: "National unemployment rate"
+
+
+# =============================================================================
+# SUPPLY PROXIES (S)
+# =============================================================================
+supply_proxies:
+  # --- PRIMARY: Building permits (FRED) ---
+  permits_national:
+    source: fred
+    series_id: "PERMIT"
+    frequency: monthly
+    lag: -18  # leads deliveries by ~18 months
+    noise_level: medium
+    weight: 0.30
+    loading: 1.0
+    status: active
+    description: "New private housing units authorized - national"
+
+  # --- SECONDARY: Housing starts (FRED) ---
+  housing_starts:
+    source: fred
+    series_id: "HOUST"
+    frequency: monthly
+    lag: -12  # leads deliveries by ~12 months
+    noise_level: medium
+    weight: 0.25
+    loading: 0.5
+    status: active
+    description: "Housing starts - national"
+
+  # --- SECONDARY: Construction costs (FRED) ---
+  construction_cost_index:
+    source: fred
+    series_id: "WPUSI012011"
+    frequency: monthly
+    lag: 0
+    noise_level: low
+    weight: 0.15
+    loading: -0.5  # higher costs may constrain supply
+    status: active
+    description: "Producer Price Index for construction materials"
+
+  # --- AVAILABLE: Other supply indicators ---
+  residential_construction_spending:
+    source: fred
+    series_id: "TLRESCONS"
+    frequency: monthly
+    lag: -6
+    noise_level: medium
+    weight: 0.10
+    loading: 1.0
+    status: available
+    description: "Total construction spending: residential"
+
+  # --- PLANNED: CoStar supply metrics ---
+  units_under_construction:
+    source: costar
+    series_key: "under_construction"
+    frequency: quarterly
+    lag: -6  # leads deliveries by ~6 months
+    noise_level: low
+    weight: 0.25
+    loading: 1.0
+    status: planned
+    description: "Units currently under construction"
+
+  deliveries:
+    source: costar
+    series_key: "deliveries"
+    frequency: quarterly
+    lag: 0
+    noise_level: low
+    weight: 0.25
+    loading: 1.0
+    status: planned
+    description: "Quarterly unit deliveries"
+
+
+# =============================================================================
+# CAPITAL FLOW PROXIES (K)
+# =============================================================================
+capital_flow_proxies:
+  # --- PRIMARY: Mortgage rates (FRED) ---
+  mortgage_rate:
+    source: fred
+    series_id: "MORTGAGE30US"
+    frequency: weekly
+    lag: 0
+    noise_level: low
+    weight: 0.30
+    loading: -1.0  # higher rates = less capital flow
+    status: active
+    description: "30-year fixed mortgage rate average"
+
+  # --- SECONDARY: Treasury yields (FRED) ---
+  treasury_10y:
+    source: fred
+    series_id: "DGS10"
+    frequency: daily
+    lag: 0
+    noise_level: low
+    weight: 0.20
+    loading: -0.5  # higher yields = capital shifts to bonds
+    status: active
+    description: "10-Year Treasury constant maturity rate"
+
+  # --- AVAILABLE: Other rate indicators ---
+  fed_funds:
+    source: fred
+    series_id: "FEDFUNDS"
+    frequency: monthly
+    lag: 0
+    noise_level: low
+    weight: 0.15
+    loading: -0.5
+    status: available
+    description: "Federal funds effective rate"
+
+  prime_rate:
+    source: fred
+    series_id: "DPRIME"
+    frequency: daily
+    lag: 0
+    noise_level: low
+    weight: 0.10
+    loading: -0.5
+    status: available
+    description: "Bank prime loan rate"
+
+  # --- PLANNED: Financial conditions (FRED) ---
+  nfci:
+    source: fred
+    series_id: "NFCI"
+    frequency: weekly
+    lag: 0
+    noise_level: low
+    weight: 0.25
+    loading: -1.0  # higher NFCI = tighter conditions = less capital
+    status: planned
+    description: "Chicago Fed National Financial Conditions Index"
+
+  nfci_credit:
+    source: fred
+    series_id: "NFCICREDIT"
+    frequency: weekly
+    lag: 0
+    noise_level: low
+    weight: 0.15
+    loading: -1.0
+    status: planned
+    description: "NFCI Credit subindex"
+
+  nfci_risk:
+    source: fred
+    series_id: "NFCIRISK"
+    frequency: weekly
+    lag: 0
+    noise_level: low
+    weight: 0.10
+    loading: -1.0
+    status: planned
+    description: "NFCI Risk subindex"
+
+  nfci_leverage:
+    source: fred
+    series_id: "NFCILEVERAGE"
+    frequency: weekly
+    lag: 0
+    noise_level: low
+    weight: 0.10
+    loading: -1.0
+    status: planned
+    description: "NFCI Leverage subindex"
+
+  # --- PLANNED: Credit conditions ---
+  lending_standards:
+    source: fred
+    series_id: "DRTSCILM"
+    frequency: quarterly
+    lag: 0
+    noise_level: medium
+    weight: 0.15
+    loading: -1.0  # tighter standards = less capital
+    status: planned
+    description: "Net % banks tightening C&I loan standards"
+
+  # --- PLANNED: CoStar capital metrics ---
+  cap_rate_spread:
+    source: costar
+    series_key: "cap_rate"
+    frequency: quarterly
+    lag: 0
+    noise_level: medium
+    weight: 0.20
+    loading: -1.0  # wider spreads = less capital
+    derived: true  # Calculated as cap_rate - 10Y treasury
+    status: planned
+    description: "Cap rate spread over 10-year Treasury"
+
+  transaction_volume:
+    source: costar
+    series_key: "sales_volume"
+    frequency: quarterly
+    lag: 0
+    noise_level: medium
+    weight: 0.20
+    loading: 1.0
+    status: planned
+    description: "Quarterly transaction volume ($)"
+
+
+# =============================================================================
+# OTHER INDICATORS (not directly mapped to D, S, K)
+# =============================================================================
+other_indicators:
+  cpi:
+    source: fred
+    series_id: "CPIAUCSL"
+    frequency: monthly
+    status: available
+    description: "Consumer Price Index - for real value adjustments"
+
+  national_employment:
+    source: fred
+    series_id: "PAYEMS"
+    frequency: monthly
+    status: available
+    description: "Total nonfarm payrolls - national benchmark"
+
+
+# =============================================================================
+# BLS SERIES BY MARKET
+# =============================================================================
+bls_msa_employment:
+  dallas:
+    series_id: "SMS48191000000000001"
+    description: "Dallas-Fort Worth-Arlington, TX Total Nonfarm Employment"
+
+  houston:
+    series_id: "SMS48264200000000001"
+    description: "Houston-The Woodlands-Sugar Land, TX Total Nonfarm Employment"
+
+  austin:
+    series_id: "SMS48120400000000001"
+    description: "Austin-Round Rock-Georgetown, TX Total Nonfarm Employment"
+
+  san_antonio:
+    series_id: "SMS48411700000000001"
+    description: "San Antonio-New Braunfels, TX Total Nonfarm Employment"
+
+
+# =============================================================================
+# AGGREGATION SETTINGS
+# =============================================================================
+aggregation:
+  # How to combine multiple proxies for each state variable
+  method: "weighted_average"  # weighted_average, pca, or factor_model
+
+  # Minimum number of non-missing proxies required
+  min_proxies: 1
+
+  # Whether to standardize proxies before combining
+  standardize: true
+
+  # Rolling window for computing weights (months)
+  weight_window: 36
+
+
+# =============================================================================
+# STATUS LEGEND
+# =============================================================================
+# active:    Currently used in model
+# available: Data accessible via API, not yet integrated
+# planned:   Identified for future testing (may require new data source)

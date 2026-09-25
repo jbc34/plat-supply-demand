@@ -1,0 +1,67 @@
+# San Antonio Multifamily — Metro Configuration
+
+metro_id: san_antonio_tx
+display_name: "San Antonio Multifamily"
+msa_code: "41700"
+state_fips: "48"
+counties: ["029", "091"]  # Bexar, Comal
+
+costar_market_key: "san_antonio_multifamily"
+
+submarkets:
+  - id: northwest
+    name: "Northwest San Antonio"
+    lat: 29.530
+    lon: -98.620
+    star_rating: "All"
+  - id: northeast
+    name: "Northeast / Converse"
+    lat: 29.520
+    lon: -98.310
+    star_rating: "All"
+  - id: alamo_ranch
+    name: "Alamo Ranch / Far West"
+    lat: 29.470
+    lon: -98.730
+    star_rating: "All"
+  - id: downtown
+    name: "Downtown / Southtown"
+    lat: 29.425
+    lon: -98.490
+    star_rating: "All"
+
+endogenous_vars:
+  - rent_growth_yoy
+  - vacancy_rate
+  - deliveries_pct_inventory
+  - absorption_pct_inventory
+
+exogenous_vars:
+  - mortgage_rate_30y
+  - unemployment_rate
+  - concession_spread
+
+fred_series:
+  mortgage_rate: "MORTGAGE30US"
+  treasury_10y: "DGS10"
+  fed_funds: "FEDFUNDS"
+  baa_spread: "BAA10Y"
+  term_spread: "T10Y2Y"
+
+bls_msa_code: "041700"
+permit_lag_months: 18
+permit_cbsa: "41700"
+migration_counties: ["029"]
+migration_interpolation: linear
+spatial_contiguity: inverse_distance
+decompose_seasonal: true
+
+enabled_models:
+  - VAREngine
+  - ECMEngine
+  - RidgeLassoEngine
+  - GBMEngine
+
+ensemble_decay: 0.9
+min_backtest_quarters: 4
+default_horizon_quarters: 8

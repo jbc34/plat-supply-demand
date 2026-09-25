@@ -1,0 +1,216 @@
+# Market Definitions Configuration
+# Each market defines geography, data source mappings, and model parameters
+
+markets:
+  dallas_multifamily:
+    name: "Dallas-Fort Worth Multifamily"
+    geography:
+      msa_code: "19100"
+      cbsa_code: "19100"
+      state: "TX"
+      counties:
+        - fips: "48113"
+          name: "Dallas"
+        - fips: "48439"
+          name: "Tarrant"
+        - fips: "48085"
+          name: "Collin"
+        - fips: "48121"
+          name: "Denton"
+
+    asset_class: "multifamily"
+    subtype: "all"  # garden, mid-rise, high-rise, or all
+
+    data_sources:
+      costar:
+        market_id: "dallas_tx"
+        submarket_ids:
+          - "uptown"
+          - "oak_lawn"
+          - "design_district"
+          - "deep_ellum"
+          - "downtown"
+      bls:
+        employment_series: "SMU48192000000000001"
+      census:
+        county_fips:
+          - "48113"
+          - "48439"
+          - "48085"
+          - "48121"
+
+    model_parameters:
+      # Demand equation parameters
+      alpha_1: 0.3   # Income sensitivity
+      alpha_2: 0.2   # Price sensitivity
+      alpha_3: 0.15  # Capital flow sensitivity
+      tau_1: 2       # Capital -> Demand lag (months)
+
+      # Supply equation parameters
+      beta_1: 0.25   # Price sensitivity
+      beta_2: 0.2    # Capital flow sensitivity
+      beta_3: 0.1    # Supply adjustment speed
+      tau_2: 18      # Price -> Supply lag (months)
+      tau_3: 12      # Capital -> Supply lag (months)
+
+      # Capital flow equation parameters
+      gamma_1: 0.3   # Return gap sensitivity
+      gamma_2: 0.15  # Price acceleration sensitivity
+      gamma_3: 0.2   # Imbalance sensitivity
+
+      # Price formation
+      lambda_: 0.1   # Price adjustment speed
+
+      # Noise parameters
+      sigma_D: 0.05  # Demand process noise
+      sigma_S: 0.03  # Supply process noise
+      sigma_K: 0.08  # Capital flow process noise
+
+    equilibrium:
+      method: "replacement_cost"
+      cap_rate_spread_over_10yr: 0.025
+      construction_cost_growth: 0.03
+
+  austin_multifamily:
+    name: "Austin Multifamily"
+    geography:
+      msa_code: "12420"
+      cbsa_code: "12420"
+      state: "TX"
+      counties:
+        - fips: "48453"
+          name: "Travis"
+        - fips: "48491"
+          name: "Williamson"
+        - fips: "48209"
+          name: "Hays"
+
+    asset_class: "multifamily"
+    subtype: "all"
+
+    data_sources:
+      costar:
+        market_id: "austin_tx"
+      bls:
+        employment_series: "SMU48128200000000001"
+      census:
+        county_fips:
+          - "48453"
+          - "48491"
+          - "48209"
+
+    model_parameters:
+      alpha_1: 0.35
+      alpha_2: 0.25
+      alpha_3: 0.2
+      tau_1: 2
+      beta_1: 0.3
+      beta_2: 0.25
+      beta_3: 0.15
+      tau_2: 15  # Faster construction in Austin
+      tau_3: 10
+      gamma_1: 0.35
+      gamma_2: 0.2
+      gamma_3: 0.25
+      lambda_: 0.15
+      sigma_D: 0.06
+      sigma_S: 0.04
+      sigma_K: 0.1
+
+    equilibrium:
+      method: "replacement_cost"
+      cap_rate_spread_over_10yr: 0.020
+
+  houston_multifamily:
+    name: "Houston Multifamily"
+    geography:
+      msa_code: "26420"
+      cbsa_code: "26420"
+      state: "TX"
+      counties:
+        - fips: "48201"
+          name: "Harris"
+        - fips: "48157"
+          name: "Fort Bend"
+        - fips: "48339"
+          name: "Montgomery"
+
+    asset_class: "multifamily"
+    subtype: "all"
+
+    data_sources:
+      costar:
+        market_id: "houston_tx"
+      bls:
+        employment_series: "SMU48264200000000001"
+      census:
+        county_fips:
+          - "48201"
+          - "48157"
+          - "48339"
+
+    model_parameters:
+      alpha_1: 0.25
+      alpha_2: 0.2
+      alpha_3: 0.15
+      tau_1: 3
+      beta_1: 0.2
+      beta_2: 0.15
+      beta_3: 0.1
+      tau_2: 16
+      tau_3: 12
+      gamma_1: 0.25
+      gamma_2: 0.15
+      gamma_3: 0.2
+      lambda_: 0.1
+      sigma_D: 0.07
+      sigma_S: 0.04
+      sigma_K: 0.12
+
+    equilibrium:
+      method: "replacement_cost"
+      cap_rate_spread_over_10yr: 0.030
+
+  san_antonio_multifamily:
+    name: "San Antonio Multifamily"
+    geography:
+      msa_code: "41700"
+      cbsa_code: "41700"
+      state: "TX"
+      counties:
+        - fips: "48029"
+          name: "Bexar"
+
+    asset_class: "multifamily"
+    subtype: "all"
+
+    data_sources:
+      costar:
+        market_id: "san_antonio_tx"
+      bls:
+        employment_series: "SMU48416600000000001"
+      census:
+        county_fips:
+          - "48029"
+
+    model_parameters:
+      alpha_1: 0.2
+      alpha_2: 0.15
+      alpha_3: 0.1
+      tau_1: 3
+      beta_1: 0.15
+      beta_2: 0.1
+      beta_3: 0.08
+      tau_2: 20
+      tau_3: 14
+      gamma_1: 0.2
+      gamma_2: 0.1
+      gamma_3: 0.15
+      lambda_: 0.08
+      sigma_D: 0.04
+      sigma_S: 0.03
+      sigma_K: 0.08
+
+    equilibrium:
+      method: "replacement_cost"
+      cap_rate_spread_over_10yr: 0.035

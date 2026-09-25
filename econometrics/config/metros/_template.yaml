@@ -1,0 +1,80 @@
+# Metro Configuration Template
+# Copy this file and rename to {metro_id}.yaml (e.g., dallas_tx.yaml)
+# All fields are documented with expected types and defaults.
+
+# --- Identity ---
+metro_id: ""                    # Unique identifier (matches filename stem)
+display_name: ""                # Human-readable name for reports
+msa_code: ""                    # CBSA code (5-digit, e.g., "19100")
+state_fips: ""                  # 2-digit state FIPS (e.g., "48")
+counties: []                    # List of 3-digit county FIPS codes in the MSA
+
+# --- CoStar Data ---
+costar_panel_path: ""           # Path to CoStar parquet dir (relative to market-study-agent)
+costar_market_key: ""           # CoStar market identifier
+
+# --- Submarkets (for spatial model W matrix) ---
+# Need >= 4 submarkets for spatial model; fewer is fine (spatial model will be skipped)
+submarkets:
+  - id: ""                      # Submarket slug (snake_case)
+    name: ""                    # Display name
+    lat: 0.0                    # Centroid latitude (WGS84)
+    lon: 0.0                    # Centroid longitude (WGS84)
+    star_rating: "All"          # CoStar star rating filter: "4 & 5 Star", "3 Star", "1 & 2 Star", "All"
+
+# --- Model Specification ---
+
+# Endogenous variables (core system — all modeled jointly in VAR)
+endogenous_vars:
+  - rent_growth_yoy             # Effective rent YoY % change (primary target)
+  - vacancy_rate                # Submarket vacancy rate
+  - deliveries_pct_inventory    # Trailing 12mo deliveries / inventory
+  - absorption_pct_inventory    # Trailing 12mo absorption / inventory
+
+# Exogenous variables (external drivers — not modeled endogenously)
+exogenous_vars:
+  - mortgage_rate_30y           # Freddie Mac 30Y fixed (FRED)
+  - unemployment_rate           # BLS LAUS MSA unemployment
+  - net_migration_returns       # IRS SOI net tax returns (annual, interpolated)
+  - income_delta_pct            # IRS SOI income quality of migration
+  - permit_pipeline             # BPS permits lagged by permit_lag_months
+  - concession_spread           # (asking - effective) / asking from CoStar
+
+# --- FRED Series IDs ---
+fred_series:
+  mortgage_rate: "MORTGAGE30US"
+  treasury_10y: "DGS10"
+  fed_funds: "FEDFUNDS"
+  baa_spread: "BAA10Y"
+  term_spread: "T10Y2Y"
+
+# --- BLS ---
+bls_msa_code: ""                # 6-digit BLS LAUS MSA code (e.g., "019100")
+
+# --- Permit Model ---
+permit_lag_months: 18           # Metro-specific, calibrated by `econ calibrate-permit-lag`
+permit_cbsa: ""                 # CBSA code for Census BPS permit query
+
+# --- Migration ---
+migration_counties: []          # County FIPS codes for IRS SOI query
+migration_interpolation: linear # How to interpolate annual SOI to quarterly: linear | step
+
+# --- Spatial Model ---
+spatial_contiguity: inverse_distance  # inverse_distance | queen
+
+# --- Seasonality ---
+decompose_seasonal: true        # Run STL decomposition before fitting models
+
+# --- Ensemble ---
+enabled_models:
+  - VAREngine
+  - ECMEngine
+  - RidgeLassoEngine
+  # - GBMEngine                 # Uncomment if lightgbm installed
+  # - SpatialEngine             # Uncomment if libpysal installed
+
+ensemble_decay: 0.9             # Exponential decay for backtest weighting (1.0 = equal weight)
+min_backtest_quarters: 4        # Minimum completed backtests before using inverse-RMSE weights
+
+# --- Forecast Defaults ---
+default_horizon_quarters: 8     # Default forecast horizon (2 years)

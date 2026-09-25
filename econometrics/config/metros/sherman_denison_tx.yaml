@@ -1,0 +1,57 @@
+# Sherman-Denison Multifamily — Metro Configuration
+
+metro_id: sherman_denison_tx
+display_name: "Sherman-Denison Multifamily"
+msa_code: "43300"
+state_fips: "48"
+counties: ["181"]  # Grayson
+
+costar_market_key: "sherman_denison_multifamily"
+
+submarkets:
+  - id: sherman
+    name: "Sherman"
+    lat: 33.636
+    lon: -96.609
+    star_rating: "All"
+  - id: denison
+    name: "Denison"
+    lat: 33.755
+    lon: -96.537
+    star_rating: "All"
+
+endogenous_vars:
+  - rent_growth_yoy
+  - vacancy_rate
+  - deliveries_pct_inventory
+  - absorption_pct_inventory
+
+exogenous_vars:
+  - mortgage_rate_30y
+  - unemployment_rate
+  - concession_spread
+
+fred_series:
+  mortgage_rate: "MORTGAGE30US"
+  treasury_10y: "DGS10"
+  fed_funds: "FEDFUNDS"
+  baa_spread: "BAA10Y"
+  term_spread: "T10Y2Y"
+
+bls_msa_code: "043300"
+permit_lag_months: 14
+permit_cbsa: "43300"
+migration_counties: ["181"]
+migration_interpolation: linear
+spatial_contiguity: inverse_distance
+decompose_seasonal: true
+
+enabled_models:
+  - VAREngine
+  - RidgeLassoEngine
+  - GBMEngine
+  # ECM excluded — small market, unlikely to have meaningful cointegration
+
+ensemble_decay: 0.9
+min_backtest_quarters: 4
+default_horizon_quarters: 8
