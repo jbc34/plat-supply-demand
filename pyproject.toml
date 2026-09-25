@@ -1,12 +1,39 @@
+[build-system]
+requires = ["setuptools>=77.0"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "supply-demand"
 version = "0.1.0"
-description = "State-space estimation of market cycle dynamics in spiral coordinates"
+description = "State-space estimation of market cycle dynamics in spiral coordinates, with an econometric rent-growth forecasting toolkit"
 readme = "README.md"
 requires-python = ">=3.10"
-license = {text = "MIT"}
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [
     {name = "paintbrush"}
+]
+keywords = [
+    "market-cycles",
+    "state-space",
+    "kalman-filter",
+    "econometrics",
+    "real-estate",
+    "multifamily",
+    "rent-forecasting",
+    "time-series",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Information Analysis",
 ]
 dependencies = [
     "numpy>=1.24",
@@ -24,6 +51,15 @@ dependencies = [
     "numpy-financial>=1.0",
     "optuna>=4.8.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/paintbrushv/plat-supply-demand"
+Repository = "https://github.com/paintbrushv/plat-supply-demand"
+Issues = "https://github.com/paintbrushv/plat-supply-demand/issues"
+Changelog = "https://github.com/paintbrushv/plat-supply-demand/blob/main/README.md"
+
+[project.scripts]
+econ = "econometrics.cli:main"
 
 [project.optional-dependencies]
 dev = [
@@ -50,16 +86,13 @@ econometrics = [
     "optuna>=3.6",
 ]
 
-[project.scripts]
-econ = "econometrics.cli:main"
-
-[build-system]
-requires = ["setuptools>=68", "wheel"]
-build-backend = "setuptools.build_meta"
-
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["supply_demand*", "econometrics*"]
+
+[tool.setuptools.package-data]
+supply_demand = ["config/*.yaml"]
+econometrics = ["config/metros/*.yaml"]
 
 [tool.black]
 line-length = 100
@@ -78,4 +111,5 @@ ignore_missing_imports = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = "test_*.py"
+pythonpath = ["."]
 addopts = "-v --tb=short"
