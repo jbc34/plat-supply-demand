@@ -46,6 +46,10 @@ data/econometrics/registry/
 data/econometrics/forecasts/
 data/econometrics/scenarios/
 
+# Skills run artifacts (generated per run, never committed)
+skills/logs/
+skills/output/
+
 # Misc
 *.log
 *.tmp
